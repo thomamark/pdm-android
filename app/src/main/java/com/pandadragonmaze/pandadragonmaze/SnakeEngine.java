@@ -36,9 +36,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private SoundPool soundPool;
     private int eat_bob = -1;
     private int snake_crash = -1;
+    private boolean isStart = true;
 
     // For tracking movement Heading
-    public enum Heading {UP, RIGHT, DOWN, LEFT}
+    public enum Heading {UP, RIGHT, DOWN, LEFT};
 
     // Start by heading to the right
     private Heading heading = Heading.RIGHT;
@@ -49,11 +50,30 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private Bitmap headLeft;
     private Bitmap headRight;
 
-    // Images for Dragon's body
-    private Bitmap bodyR2L;
-
     // Current head image
     private Bitmap headImg;
+
+
+    // Images for Dragon's body
+    private Bitmap bodyR2L;
+    private Bitmap bodyR2U;
+    private Bitmap bodyR2D;
+    private Bitmap bodyL2R;
+    private Bitmap bodyL2D;
+    private Bitmap bodyL2U;
+    private Bitmap bodyU2D;
+    private Bitmap bodyU2L;
+    private Bitmap bodyU2R;
+    private Bitmap bodyD2U;
+    private Bitmap bodyD2L;
+    private Bitmap bodyD2R;
+    private Bitmap tailD;
+    private Bitmap tailL;
+    private Bitmap tailR;
+    private Bitmap tailU;
+
+
+    private Bitmap bodyImg;
 
     private int headFrameHeight;
     private int headFrameWidth;
@@ -128,9 +148,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         headFrameHeight = blockSize * SPRITE_SCALE;
         headFrameWidth = blockSize * SPRITE_SCALE;
-        bodyFrameWidth = bodyFrameHeight = blockSize * SPRITE_SCALE;
+        bodyFrameWidth = blockSize * SPRITE_SCALE;
+        bodyFrameHeight = blockSize / 2 * SPRITE_SCALE;
 
-        // Set the sound up
+                // Set the sound up
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try {
             // Create objects of the 2 required classes
@@ -164,6 +185,33 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             // Load (positive) body image
             bodyR2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoleft);
             bodyR2L = Bitmap.createScaledBitmap(bodyR2L, bodyFrameWidth, bodyFrameHeight,false);
+            bodyR2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoup);
+            bodyR2U = Bitmap.createScaledBitmap(bodyR2U, bodyFrameWidth, bodyFrameHeight,false);
+            bodyR2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttodown);
+            bodyR2D = Bitmap.createScaledBitmap(bodyR2D, bodyFrameWidth, bodyFrameHeight,false);
+            bodyL2R = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_lefttoright);
+            bodyL2R = Bitmap.createScaledBitmap(bodyL2R, bodyFrameWidth, bodyFrameHeight,false);
+            bodyL2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_lefttodown);
+            bodyL2D = Bitmap.createScaledBitmap(bodyL2D, bodyFrameWidth, bodyFrameHeight,false);
+            bodyL2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_lefttoup);
+            bodyL2U = Bitmap.createScaledBitmap(bodyL2U, bodyFrameWidth, bodyFrameHeight,false);
+            bodyU2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_uptodown);
+            bodyU2D = Bitmap.createScaledBitmap(bodyU2D, bodyFrameWidth, bodyFrameHeight,false);
+            bodyD2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_downtoup);
+            bodyD2U = Bitmap.createScaledBitmap(bodyD2U, bodyFrameWidth, bodyFrameHeight,false);
+            bodyD2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_downtoleft);
+            bodyD2L = Bitmap.createScaledBitmap(bodyD2L, bodyFrameWidth, bodyFrameHeight,false);
+            bodyD2R = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_downtoright);
+            bodyD2R = Bitmap.createScaledBitmap(bodyD2R, bodyFrameWidth, bodyFrameHeight,false);
+            tailD = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_down);
+            tailD = Bitmap.createScaledBitmap(tailD, bodyFrameWidth, bodyFrameHeight,false);
+            tailL = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_left);
+            tailL = Bitmap.createScaledBitmap(tailL, bodyFrameWidth, bodyFrameHeight,false);
+            tailR = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_right);
+            tailR = Bitmap.createScaledBitmap(tailR, bodyFrameWidth, bodyFrameHeight,false);
+            tailU = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_up);
+            tailU = Bitmap.createScaledBitmap(tailU, bodyFrameWidth, bodyFrameHeight,false);
+
 
 
         } catch (IOException e) {
@@ -371,6 +419,7 @@ public class SnakeEngine extends SurfaceView implements Runnable {
                         case UP:
                             heading = Heading.RIGHT;
                             headImg = headRight;
+                            bodyImg = bodyU2R;
                             break;
                         case RIGHT:
                             heading = Heading.DOWN;
