@@ -39,6 +39,7 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     // For tracking movement Heading
     public enum Heading {UP, RIGHT, DOWN, LEFT}
+
     // Start by heading to the right
     private Heading heading = Heading.RIGHT;
 
@@ -48,13 +49,17 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private Bitmap headLeft;
     private Bitmap headRight;
 
+    // Images for Dragon's body
+    private Bitmap bodyR2L;
+
     // Current head image
     private Bitmap headImg;
 
-    private int headFrameDefaultSize = 32;
     private int headFrameHeight;
     private int headFrameWidth;
-    private static int SPRITE_SCALE = 2;
+    private int bodyFrameHeight;
+    private int bodyFrameWidth;
+    private static int SPRITE_SCALE = 1;
 
 
     // To hold the screen size in pixels
@@ -123,6 +128,7 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         headFrameHeight = blockSize * SPRITE_SCALE;
         headFrameWidth = blockSize * SPRITE_SCALE;
+        bodyFrameWidth = bodyFrameHeight = blockSize * SPRITE_SCALE;
 
         // Set the sound up
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -139,17 +145,26 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             descriptor = assetManager.openFd("death_sound.ogg");
             snake_crash = soundPool.load(descriptor, 0);
 
-            //Load images
+            //Load head images
             headUp = BitmapFactory.decodeResource(this.getResources(), R.drawable.head_up);
             headUp = Bitmap.createScaledBitmap(headUp, headFrameWidth, headFrameHeight,false);
+
             headLeft = BitmapFactory.decodeResource(this.getResources(), R.drawable.head_left);
             headLeft = Bitmap.createScaledBitmap(headLeft,headFrameWidth, headFrameHeight,false);
+
             headRight = BitmapFactory.decodeResource(this.getResources(), R.drawable.head_right);
             headRight = Bitmap.createScaledBitmap(headRight,headFrameWidth, headFrameHeight,false);
+
             headDown = BitmapFactory.decodeResource(this.getResources(), R.drawable.head_down);
             headDown = Bitmap.createScaledBitmap(headDown,headFrameWidth, headFrameHeight,false);
 
+            // Dragon starts by moving left
             headImg = headLeft;
+
+            // Load (positive) body image
+            bodyR2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoleft);
+            bodyR2L = Bitmap.createScaledBitmap(bodyR2L, bodyFrameWidth, bodyFrameHeight,false);
+
 
         } catch (IOException e) {
             // Error
