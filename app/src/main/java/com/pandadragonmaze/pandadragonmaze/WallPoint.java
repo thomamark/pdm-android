@@ -2,13 +2,9 @@ package com.pandadragonmaze.pandadragonmaze;
 
 import android.graphics.Bitmap;
 
-public class PandaPoint extends MazePoint {
+public class WallPoint extends MazePoint {
 
-    /**
-     * A Panda
-     */
-
-    public PandaPoint(int row, int col, Bitmap img, SnakeEngine engine) {
+    public WallPoint(int row, int col, Bitmap img, SnakeEngine engine) {
         this.row = row;
         this.col = col;
         this.img = img;
@@ -16,6 +12,8 @@ public class PandaPoint extends MazePoint {
     }
 
     public void isOn() {
-        this.engine.pickUp(this);
+        // You die when you hit a wall :(
+        this.engine.die();
     }
+
 }

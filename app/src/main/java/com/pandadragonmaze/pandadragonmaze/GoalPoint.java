@@ -9,12 +9,19 @@ public class GoalPoint extends MazePoint {
      */
     private int goal;
 
-    public GoalPoint(int row, int col, Bitmap img, int goal) {
-        super(row, col, img, PointType.GOAL);
+    public GoalPoint(int row, int col, Bitmap img, SnakeEngine engine, int goal) {
+        this.row = row;
+        this.col = col;
+        this.img = img;
+        this.engine = engine;
         this.goal = goal;
     }
 
     public int getGoal() {
         return this.goal;
+    }
+
+    public void isOn() {
+        this.engine.loadLevel(this.goal);
     }
 }

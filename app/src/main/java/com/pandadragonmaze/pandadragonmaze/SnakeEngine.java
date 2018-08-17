@@ -144,7 +144,8 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         // Work out how many pixels each block is
         blockSize = screenX / NUM_BLOCKS_WIDE;
         // How many blocks of the same size will fit into the height
-        numBlocksHigh = screenY / blockSize;
+        // numBlocksHigh = screenY / blockSize;
+        numBlocksHigh = screenY / blockSize / 2;
 
         headFrameHeight = blockSize * SPRITE_SCALE;
         headFrameWidth = blockSize * SPRITE_SCALE;
@@ -262,6 +263,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     }
 
     public void newGame() {
+        // create maze
+        // load points
+        // set dragon start point and direction
+
         snakeLength = 1;
         snakeXs[0] = NUM_BLOCKS_WIDE / 2;
         snakeYs[0] = numBlocksHigh / 2;
@@ -329,6 +334,19 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     }
 
+    public void loadLevel(int level) {
+        // TODO: add code to load a new level
+    }
+
+    public void pickUp(PandaPoint p) {
+        // TODO: add code to pick up a panda
+    }
+
+    public void die() {
+        soundPool.play(snake_crash, 1, 1, 0, 0, 1);
+
+        newGame();
+    }
 
     public void update() {
         // Did the head of the snake eat Bob?

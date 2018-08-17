@@ -5,36 +5,47 @@ import android.graphics.Bitmap;
 /**
  * A point in a maze
  */
-public class MazePoint {
+abstract public class MazePoint {
 
-    public enum PointType {WALL, PANDA, GOAL, DRAGON};
+    // Variables
+    int row;
+    int col;
+    Bitmap img;
+    SnakeEngine engine;
 
-    private int row;
-    private int col;
-    private Bitmap img;
-    private PointType type;
+    public int getRow() {
+        return row;
+    }
 
-    public MazePoint(int row, int col, Bitmap img) {
+    public void setRow(int row) {
         this.row = row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
         this.col = col;
+    }
+
+    public Bitmap getImg() {
+        return img;
+    }
+
+    public void setImg(Bitmap img) {
         this.img = img;
-        this.type = PointType.WALL;
     }
 
-    public MazePoint(int row, int col, Bitmap img, PointType type) {
-        this.row = row;
-        this.col = col;
-        this.img = img;
-        this.type = type;
+    public SnakeEngine getEngine() {
+        return engine;
     }
 
-    public Bitmap getBitmap() {
-        return this.img;
+    public void setEngine(SnakeEngine engine) {
+        this.engine = engine;
     }
 
-    public PointType getType() {
-        return this.type;
-    }
+    abstract public void isOn() { }
 
 }
 
