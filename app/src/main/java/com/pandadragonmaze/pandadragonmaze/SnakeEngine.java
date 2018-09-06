@@ -88,6 +88,12 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private int headFrameWidth;
     private int bodyFrameHeight;
     private int bodyFrameWidth;
+    private int pandaFrameHeight;
+    private int pandaFrameWidth;
+    private int goalFrameHeight;
+    private int goalFrameWidth;
+    private int wallFrameHeight;
+    private int wallFrameWidth;
 
     private Bitmap wall_9slice_bc;
     private Bitmap wall_9slice_mc;
@@ -106,6 +112,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private Bitmap wall_9slice_tc;
     private Bitmap wall_block_2x2;
     private Bitmap wall_stright_horizontal;
+
+    private Bitmap panda;
+    private Bitmap goal;
+
 
     private static int SPRITE_SCALE = 1;
 
@@ -181,6 +191,12 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         headFrameWidth = blockSize * SPRITE_SCALE;
         blockWidth = bodyFrameWidth = blockSize * SPRITE_SCALE;
         blockHeight = bodyFrameHeight = blockSize / 2 * SPRITE_SCALE;
+        wallFrameWidth = blockWidth;
+        wallFrameHeight = (int) (1.6 * (float) blockHeight);
+        pandaFrameHeight = (int) (1.5 * (float) blockHeight);
+        pandaFrameWidth = (int) (0.75 *  (float) blockWidth);
+        goalFrameHeight = (int) (2.4 * (float) blockHeight);
+        goalFrameWidth = blockWidth;
 
                 // Set the sound up
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -247,42 +263,50 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             tailU = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_up);
             tailU = Bitmap.createScaledBitmap(tailU, bodyFrameWidth, bodyFrameHeight,false);
 
+            // Pandas
+            panda = BitmapFactory.decodeResource(this.getResources(), R.drawable.panda);
+            panda = Bitmap.createScaledBitmap(panda, pandaFrameWidth, pandaFrameHeight,false);
+
+            // Goal
+            goal = BitmapFactory.decodeResource(this.getResources(), R.drawable.goal_1);
+            goal = Bitmap.createScaledBitmap(goal, goalFrameWidth, goalFrameHeight,false);
+
 
             // Load Wall images
             wall_9slice_bc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bc);
-            wall_9slice_bc = Bitmap.createScaledBitmap(wall_9slice_bc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_bc = Bitmap.createScaledBitmap(wall_9slice_bc, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_mc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_mc);
-            wall_9slice_mc = Bitmap.createScaledBitmap(wall_9slice_mc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_mc = Bitmap.createScaledBitmap(wall_9slice_mc, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_tl = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tl);
-            wall_9slice_tl = Bitmap.createScaledBitmap(wall_9slice_tl, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tl = Bitmap.createScaledBitmap(wall_9slice_tl, wallFrameWidth, wallFrameHeight,false);
             wall_block_center = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_center);
-            wall_block_center = Bitmap.createScaledBitmap(wall_block_center, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_center = Bitmap.createScaledBitmap(wall_block_center, wallFrameWidth, wallFrameHeight,false);
             wall_stright_vertical = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_stright_vertical);
-            wall_stright_vertical = Bitmap.createScaledBitmap(wall_stright_vertical, bodyFrameWidth, bodyFrameHeight,false);
+            wall_stright_vertical = Bitmap.createScaledBitmap(wall_stright_vertical, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_bl = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bl);
-            wall_9slice_bl = Bitmap.createScaledBitmap(wall_9slice_bl, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_bl = Bitmap.createScaledBitmap(wall_9slice_bl, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_ml = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_ml);
-            wall_9slice_ml = Bitmap.createScaledBitmap(wall_9slice_ml, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_ml = Bitmap.createScaledBitmap(wall_9slice_ml, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_tr = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tr);
-            wall_9slice_tr = Bitmap.createScaledBitmap(wall_9slice_tr, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tr = Bitmap.createScaledBitmap(wall_9slice_tr, wallFrameWidth, wallFrameHeight,false);
             wall_block_left = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_left);
-            wall_block_left = Bitmap.createScaledBitmap(wall_block_left, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_left = Bitmap.createScaledBitmap(wall_block_left, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_bm = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bm);
-            wall_9slice_bm = Bitmap.createScaledBitmap(wall_9slice_bm, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_bm = Bitmap.createScaledBitmap(wall_9slice_bm, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_mr = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_mr);
-            wall_9slice_mr = Bitmap.createScaledBitmap(wall_9slice_mr, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_mr = Bitmap.createScaledBitmap(wall_9slice_mr, wallFrameWidth, wallFrameHeight,false);
             wall_block = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block);
-            wall_block = Bitmap.createScaledBitmap(wall_block, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block = Bitmap.createScaledBitmap(wall_block, wallFrameWidth, wallFrameHeight,false);
             wall_block_right = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_right);
-            wall_block_right = Bitmap.createScaledBitmap(wall_block_right, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_right = Bitmap.createScaledBitmap(wall_block_right, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_br = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_br);
-            wall_9slice_br = Bitmap.createScaledBitmap(wall_9slice_br, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_br = Bitmap.createScaledBitmap(wall_9slice_br, wallFrameWidth, wallFrameHeight,false);
             wall_9slice_tc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tc);
-            wall_9slice_tc = Bitmap.createScaledBitmap(wall_9slice_tc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tc = Bitmap.createScaledBitmap(wall_9slice_tc, wallFrameWidth, wallFrameHeight,false);
             wall_block_2x2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_2x2);
-            wall_block_2x2 = Bitmap.createScaledBitmap(wall_block_2x2, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_2x2 = Bitmap.createScaledBitmap(wall_block_2x2, wallFrameWidth, wallFrameHeight,false);
             wall_stright_horizontal = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_stright_horizontal);
-            wall_stright_horizontal = Bitmap.createScaledBitmap(wall_stright_horizontal, bodyFrameWidth, bodyFrameHeight,false);
+            wall_stright_horizontal = Bitmap.createScaledBitmap(wall_stright_horizontal, wallFrameWidth, wallFrameHeight,false);
 
 
         } catch (IOException e) {
@@ -337,6 +361,8 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         // create maze
         maze = new Maze(this);
         maze.addPoint(new WallPoint(5,5, wall_block, this));
+        maze.addPoint(new PandaPoint(2,15, panda, this));
+        maze.addPoint(new GoalPoint(13,26, goal, this, 2));
         prevHeading = Heading.START;
 
         // load points
@@ -468,6 +494,7 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     public void loadLevel(int level) {
         // TODO: add code to load a new level
+        newGame();
     }
 
     public void pickUp(PandaPoint p) {
