@@ -84,12 +84,29 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private Bitmap tailU;
 
 
-    private Bitmap bodyImg;
-
     private int headFrameHeight;
     private int headFrameWidth;
     private int bodyFrameHeight;
     private int bodyFrameWidth;
+
+    private Bitmap wall_9slice_bc;
+    private Bitmap wall_9slice_mc;
+    private Bitmap wall_9slice_tl;
+    private Bitmap wall_block_center;
+    private Bitmap wall_stright_vertical;
+    private Bitmap wall_9slice_bl;
+    private Bitmap wall_9slice_ml;
+    private Bitmap wall_9slice_tr;
+    private Bitmap wall_block_left;
+    private Bitmap wall_9slice_bm;
+    private Bitmap wall_9slice_mr;
+    private Bitmap wall_block;
+    private Bitmap wall_block_right;
+    private Bitmap wall_9slice_br;
+    private Bitmap wall_9slice_tc;
+    private Bitmap wall_block_2x2;
+    private Bitmap wall_stright_horizontal;
+
     private static int SPRITE_SCALE = 1;
 
 
@@ -232,8 +249,40 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
 
             // Load Wall images
-
-
+            wall_9slice_bc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bc);
+            wall_9slice_bc = Bitmap.createScaledBitmap(wall_9slice_bc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_mc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_mc);
+            wall_9slice_mc = Bitmap.createScaledBitmap(wall_9slice_mc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tl = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tl);
+            wall_9slice_tl = Bitmap.createScaledBitmap(wall_9slice_tl, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_center = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_center);
+            wall_block_center = Bitmap.createScaledBitmap(wall_block_center, bodyFrameWidth, bodyFrameHeight,false);
+            wall_stright_vertical = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_stright_vertical);
+            wall_stright_vertical = Bitmap.createScaledBitmap(wall_stright_vertical, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_bl = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bl);
+            wall_9slice_bl = Bitmap.createScaledBitmap(wall_9slice_bl, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_ml = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_ml);
+            wall_9slice_ml = Bitmap.createScaledBitmap(wall_9slice_ml, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tr = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tr);
+            wall_9slice_tr = Bitmap.createScaledBitmap(wall_9slice_tr, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_left = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_left);
+            wall_block_left = Bitmap.createScaledBitmap(wall_block_left, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_bm = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_bm);
+            wall_9slice_bm = Bitmap.createScaledBitmap(wall_9slice_bm, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_mr = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_mr);
+            wall_9slice_mr = Bitmap.createScaledBitmap(wall_9slice_mr, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block);
+            wall_block = Bitmap.createScaledBitmap(wall_block, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_right = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_right);
+            wall_block_right = Bitmap.createScaledBitmap(wall_block_right, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_br = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_br);
+            wall_9slice_br = Bitmap.createScaledBitmap(wall_9slice_br, bodyFrameWidth, bodyFrameHeight,false);
+            wall_9slice_tc = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_9slice_tc);
+            wall_9slice_tc = Bitmap.createScaledBitmap(wall_9slice_tc, bodyFrameWidth, bodyFrameHeight,false);
+            wall_block_2x2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_block_2x2);
+            wall_block_2x2 = Bitmap.createScaledBitmap(wall_block_2x2, bodyFrameWidth, bodyFrameHeight,false);
+            wall_stright_horizontal = BitmapFactory.decodeResource(this.getResources(), R.drawable.wall_stright_horizontal);
+            wall_stright_horizontal = Bitmap.createScaledBitmap(wall_stright_horizontal, bodyFrameWidth, bodyFrameHeight,false);
 
 
         } catch (IOException e) {
@@ -287,7 +336,7 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         // create maze
         maze = new Maze(this);
-//        maze.addPoint(new WallPoint(2,2, ))
+        maze.addPoint(new WallPoint(5,5, wall_block, this));
         prevHeading = Heading.START;
 
         // load points
@@ -379,21 +428,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             default:
                 // Should never get here, so throw in a bad image to make it obvious
                 maze.addPoint(new DragonPoint(prevRow, prevCol, headDown, this));
-//                switch (heading) {
-//                    case RIGHT:
-//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyL2R, this));
-//                        break;
-//                    case LEFT:
-//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyR2L, this));
-//                        break;
-//                    case UP:
-//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyD2U, this));
-//                        break;
-//                    case DOWN:
-//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyU2D, this));
-//                        break;
-//                }
-//                break;
         }
     }
 
@@ -401,30 +435,18 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         // save the prior heading for future rendering
         this.prevHeading = heading;
-//        prevRow = dragonRow;
-//        prevCol= dragonCol;
-
-
-//        for (int i = snakeLength; i>0; i--) {
-//            snakeXs[i] = snakeXs[i-1];
-//            snakeYs[i] = snakeYs[i-1];
-//        }
 
         switch (heading) {
             case UP:
-//                snakeYs[0]--;
                 dragonRow--;
                 break;
             case RIGHT:
-//                snakeXs[0]++;
                 dragonCol++;
                 break;
             case DOWN:
-//                snakeYs[0]++;
                 dragonRow++;
                 break;
             case LEFT:
-//                snakeXs[0]--;
                 dragonCol--;
                 break;
         }
@@ -439,19 +461,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         if (dragonCol >= NUM_BLOCKS_WIDE) dead = true;
         if (dragonRow == -1) dead = true;
         if (dragonRow >= numBlocksHigh) dead = true;
-
-//        if (snakeXs[0] == -1) dead = true;
-//        if (snakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
-//        if (snakeYs[0] == -1) dead = true;
-//        if (snakeYs[0] == numBlocksHigh) dead = true;
-
-//
-//        // Eaten itself?
-//        for (int i = snakeLength - 1; i > 0; i--) {
-//            if ((i > 4) && (snakeXs[0] == snakeXs[i]) && (snakeYs[0] == snakeYs[i])) {
-//                dead = true;
-//            }
-//        }
 
         return dead;
 
@@ -473,12 +482,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     public void update() {
         // Did the head of the snake eat Bob?
-//        if (snakeXs[0] == bobX && snakeYs[0] == bobY) {
         if (dragonCol == bobX && dragonRow == bobY) {
             eatBob();
 
         }
-
 
         addDragonBody(dragonRow, dragonCol, prevHeading);
 
@@ -492,7 +499,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         }
 
         maze.isOn(dragonRow, dragonCol);
-
 
     }
 
@@ -511,18 +517,8 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             paint.setTextSize(90);
             canvas.drawText("Score:" + score, 10, 70, paint);
 
-//            // Draw the snake one block at a time
-//            for (int i = 1; i < snakeLength; i++) {
-//                canvas.drawRect(snakeXs[i] * blockSize,
-//                        (snakeYs[i] * blockSize),
-//                        (snakeXs[i] * blockSize) + blockSize,
-//                        (snakeYs[i] * blockSize) + blockSize,
-//                        paint);
-//            }
-
             //Draw the head
             canvas.drawBitmap(headImg, dragonCol*blockWidth, dragonRow*blockHeight, paint);
-//            canvas.drawBitmap(headImg, snakeXs[0]*blockSize, snakeYs[0]*blockSize, paint);
 
             // Draw the full maze every time
             // TODO: Optimize to only draw the moving parts
