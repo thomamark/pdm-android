@@ -45,7 +45,7 @@ abstract public class MazePoint {
         this.engine = engine;
     }
 
-    abstract public void isOn() { }
+    abstract public void isOn();
 
 }
 

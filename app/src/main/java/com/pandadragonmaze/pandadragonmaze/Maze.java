@@ -8,22 +8,23 @@ import android.graphics.Bitmap;
  */
 public class Maze {
 
-    private MazePoint[][] myMaze;
+    private MazePoint[][] myPoints;
     private static final int defaultMazeWidth = 32;
     private static final int defaultMazeHeight = 16;
+
     private int height;
     private int width;
     private SnakeEngine engine;
 
     public Maze(SnakeEngine engine) {
-        this.myMaze = new MazePoint[defaultMazeHeight][defaultMazeWidth];
+        this.myPoints = new MazePoint[defaultMazeHeight][defaultMazeWidth];
         this.height = defaultMazeHeight;
         this.width = defaultMazeWidth;
         this.engine = engine;
     }
 
     public Maze(int height, int width, SnakeEngine engine) {
-        this.myMaze = new MazePoint[height][width];
+        this.myPoints = new MazePoint[height][width];
         this.height = height;
         this.width = width;
         this.engine = engine;
@@ -31,23 +32,46 @@ public class Maze {
 
 
     public Bitmap getBitMap(int row, int col) {
-        return myMaze[row][col].getImg();
+        return (myPoints[row][col] == null) ? null : myPoints[row][col].getImg();
+    }
+
+    public boolean hasPoint(int r, int c) {
+        return myPoints[r][c] != null;
     }
 
 //    public MazePoint.PointType getType(int row, int col) {
-//        return myMaze[row][col].getType();
+//        return myPoints[row][col].getType();
 //    }
 
 //    public int getGoal(int row, int col) {
-//        if(myMaze[row][col].getType() == MazePoint.PointType.GOAL) {
-//            return ((GoalPoint) myMaze[row][col]).getGoal();
+//        if(myPoints[row][col].getType() == MazePoint.PointType.GOAL) {
+//            return ((GoalPoint) myPoints[row][col]).getGoal();
 //        } else {
 //            return -1;
 //        }
 //    }
 
     public MazePoint[][] getPoints() {
-        return myMaze;
+        return myPoints;
     }
+
+    public void addPoint(MazePoint p) {
+        myPoints[p.getRow()][p.getCol()] = p;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void isOn(int r, int c) {
+        if (hasPoint(r, c)) {
+            myPoints[r][c].isOn();
+        }
+    }
+
 
 }

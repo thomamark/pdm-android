@@ -38,11 +38,22 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private int snake_crash = -1;
     private boolean isStart = true;
 
-    // For tracking movement Heading
-    public enum Heading {UP, RIGHT, DOWN, LEFT};
+    // The current maze
+    private Maze maze;
 
-    // Start by heading to the right
+    // For tracking movement Heading
+    public enum Heading {UP, RIGHT, DOWN, LEFT, START}
+
+    // Variables for the Dragon's current position
     private Heading heading = Heading.RIGHT;
+    private int dragonRow;
+    private int dragonCol;
+
+
+    // Store the previous heading & position for image rendering
+    private Heading prevHeading = Heading.START;
+//    private int prevRow;
+//    private int prevCol;
 
     // Images for the Dragon's head
     private Bitmap headUp;
@@ -143,14 +154,16 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         // Work out how many pixels each block is
         blockSize = screenX / NUM_BLOCKS_WIDE;
-        // How many blocks of the same size will fit into the height
-        // numBlocksHigh = screenY / blockSize;
-        numBlocksHigh = screenY / blockSize / 2;
+
+        // Blocks are half as tall as they are wide
+//        numBlocksHigh = screenY / blockHeight;
+        numBlocksHigh = NUM_BLOCKS_WIDE / 2;
+        //TODO: differentiate between block width and height
 
         headFrameHeight = blockSize * SPRITE_SCALE;
         headFrameWidth = blockSize * SPRITE_SCALE;
-        bodyFrameWidth = blockSize * SPRITE_SCALE;
-        bodyFrameHeight = blockSize / 2 * SPRITE_SCALE;
+        blockWidth = bodyFrameWidth = blockSize * SPRITE_SCALE;
+        blockHeight = bodyFrameHeight = blockSize / 2 * SPRITE_SCALE;
 
                 // Set the sound up
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -181,15 +194,15 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             headDown = Bitmap.createScaledBitmap(headDown,headFrameWidth, headFrameHeight,false);
 
             // Dragon starts by moving left
-            headImg = headLeft;
+            headImg = headRight;
 
             // Load (positive) body image
             bodyR2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoleft);
             bodyR2L = Bitmap.createScaledBitmap(bodyR2L, bodyFrameWidth, bodyFrameHeight,false);
-            bodyR2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoup);
-            bodyR2U = Bitmap.createScaledBitmap(bodyR2U, bodyFrameWidth, bodyFrameHeight,false);
             bodyR2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttodown);
             bodyR2D = Bitmap.createScaledBitmap(bodyR2D, bodyFrameWidth, bodyFrameHeight,false);
+            bodyR2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_righttoup);
+            bodyR2U = Bitmap.createScaledBitmap(bodyR2U, bodyFrameWidth, bodyFrameHeight,false);
             bodyL2R = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_lefttoright);
             bodyL2R = Bitmap.createScaledBitmap(bodyL2R, bodyFrameWidth, bodyFrameHeight,false);
             bodyL2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_lefttodown);
@@ -198,6 +211,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             bodyL2U = Bitmap.createScaledBitmap(bodyL2U, bodyFrameWidth, bodyFrameHeight,false);
             bodyU2D = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_uptodown);
             bodyU2D = Bitmap.createScaledBitmap(bodyU2D, bodyFrameWidth, bodyFrameHeight,false);
+            bodyU2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_uptoleft);
+            bodyU2L = Bitmap.createScaledBitmap(bodyU2L, bodyFrameWidth, bodyFrameHeight,false);
+            bodyU2R = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_uptoright);
+            bodyU2R = Bitmap.createScaledBitmap(bodyU2R, bodyFrameWidth, bodyFrameHeight,false);
             bodyD2U = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_downtoup);
             bodyD2U = Bitmap.createScaledBitmap(bodyD2U, bodyFrameWidth, bodyFrameHeight,false);
             bodyD2L = BitmapFactory.decodeResource(this.getResources(), R.drawable.body_downtoleft);
@@ -212,6 +229,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             tailR = Bitmap.createScaledBitmap(tailR, bodyFrameWidth, bodyFrameHeight,false);
             tailU = BitmapFactory.decodeResource(this.getResources(), R.drawable.tail_up);
             tailU = Bitmap.createScaledBitmap(tailU, bodyFrameWidth, bodyFrameHeight,false);
+
+
+            // Load Wall images
+
 
 
 
@@ -263,13 +284,17 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     }
 
     public void newGame() {
+
         // create maze
+        maze = new Maze(this);
+//        maze.addPoint(new WallPoint(2,2, ))
+        prevHeading = Heading.START;
+
         // load points
         // set dragon start point and direction
 
-        snakeLength = 1;
-        snakeXs[0] = NUM_BLOCKS_WIDE / 2;
-        snakeYs[0] = numBlocksHigh / 2;
+        dragonRow = numBlocksHigh /2;
+        dragonCol = NUM_BLOCKS_WIDE / 2;
 
         spawnBob();
 
@@ -291,24 +316,116 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         soundPool.play(eat_bob, 1, 1, 0, 0, 1);
     }
 
-    private void moveSnake() {
-        for (int i = snakeLength; i>0; i--) {
-            snakeXs[i] = snakeXs[i-1];
-            snakeYs[i] = snakeYs[i-1];
+    private void addDragonBody(int prevRow, int prevCol, Heading prevHeading) {
+        // Add the snake body to the Maze
+        switch (prevHeading) {
+            case START:
+                maze.addPoint(new DragonPoint(prevRow, prevCol, getTailImg(heading), this));
+                break;
+            case LEFT:
+                switch (heading) {
+                    case LEFT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyR2L, this));
+                        break;
+                    case UP:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyR2U, this));
+                        break;
+                    case DOWN:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyR2D, this));
+                        break;
+                }
+                break;
+            case RIGHT:
+                switch (heading) {
+                    case RIGHT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyL2R, this));
+                        break;
+                    case UP:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyL2U, this));
+                        break;
+                    case DOWN:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyL2D, this));
+                        break;
+                }
+                break;
+
+            case UP:
+                switch (heading) {
+                    case RIGHT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyU2R, this));
+                        break;
+                    case LEFT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyU2L, this));
+                        break;
+                    case UP:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyD2U, this));
+                        break;
+                }
+                break;
+
+            case DOWN:
+                switch (heading) {
+                    case RIGHT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyD2R, this));
+                        break;
+                    case LEFT:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyD2L, this));
+                        break;
+                    case DOWN:
+                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyU2D, this));
+                        break;
+                }
+                break;
+            default:
+                // Should never get here, so throw in a bad image to make it obvious
+                maze.addPoint(new DragonPoint(prevRow, prevCol, headDown, this));
+//                switch (heading) {
+//                    case RIGHT:
+//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyL2R, this));
+//                        break;
+//                    case LEFT:
+//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyR2L, this));
+//                        break;
+//                    case UP:
+//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyD2U, this));
+//                        break;
+//                    case DOWN:
+//                        maze.addPoint(new DragonPoint(prevRow, prevCol, bodyU2D, this));
+//                        break;
+//                }
+//                break;
         }
+    }
+
+    private void moveDragon() {
+
+        // save the prior heading for future rendering
+        this.prevHeading = heading;
+//        prevRow = dragonRow;
+//        prevCol= dragonCol;
+
+
+//        for (int i = snakeLength; i>0; i--) {
+//            snakeXs[i] = snakeXs[i-1];
+//            snakeYs[i] = snakeYs[i-1];
+//        }
 
         switch (heading) {
             case UP:
-                snakeYs[0]--;
+//                snakeYs[0]--;
+                dragonRow--;
                 break;
             case RIGHT:
-                snakeXs[0]++;
+//                snakeXs[0]++;
+                dragonCol++;
                 break;
             case DOWN:
-                snakeYs[0]++;
+//                snakeYs[0]++;
+                dragonRow++;
                 break;
             case LEFT:
-                snakeXs[0]--;
+//                snakeXs[0]--;
+                dragonCol--;
                 break;
         }
     }
@@ -318,17 +435,23 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         boolean dead = false;
 
         // Hit the screen edge
-        if (snakeXs[0] == -1) dead = true;
-        if (snakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
-        if (snakeYs[0] == -1) dead = true;
-        if (snakeYs[0] == numBlocksHigh) dead = true;
+        if (dragonCol == -1) dead = true;
+        if (dragonCol >= NUM_BLOCKS_WIDE) dead = true;
+        if (dragonRow == -1) dead = true;
+        if (dragonRow >= numBlocksHigh) dead = true;
 
-        // Eaten itself?
-        for (int i = snakeLength - 1; i > 0; i--) {
-            if ((i > 4) && (snakeXs[0] == snakeXs[i]) && (snakeYs[0] == snakeYs[i])) {
-                dead = true;
-            }
-        }
+//        if (snakeXs[0] == -1) dead = true;
+//        if (snakeXs[0] >= NUM_BLOCKS_WIDE) dead = true;
+//        if (snakeYs[0] == -1) dead = true;
+//        if (snakeYs[0] == numBlocksHigh) dead = true;
+
+//
+//        // Eaten itself?
+//        for (int i = snakeLength - 1; i > 0; i--) {
+//            if ((i > 4) && (snakeXs[0] == snakeXs[i]) && (snakeYs[0] == snakeYs[i])) {
+//                dead = true;
+//            }
+//        }
 
         return dead;
 
@@ -350,18 +473,27 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     public void update() {
         // Did the head of the snake eat Bob?
-        if (snakeXs[0] == bobX && snakeYs[0] == bobY) {
+//        if (snakeXs[0] == bobX && snakeYs[0] == bobY) {
+        if (dragonCol == bobX && dragonRow == bobY) {
             eatBob();
+
         }
 
-        moveSnake();
 
+        addDragonBody(dragonRow, dragonCol, prevHeading);
+
+        moveDragon();
+
+        //TODO: remove when wall boundaries are put in place
         if (detectDeath()) {
             //start again
             soundPool.play(snake_crash, 1, 1, 0, 0, 1);
-
             newGame();
         }
+
+        maze.isOn(dragonRow, dragonCol);
+
+
     }
 
     public void draw() {
@@ -379,26 +511,39 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             paint.setTextSize(90);
             canvas.drawText("Score:" + score, 10, 70, paint);
 
-            // Draw the snake one block at a time
-            for (int i = 1; i < snakeLength; i++) {
-                canvas.drawRect(snakeXs[i] * blockSize,
-                        (snakeYs[i] * blockSize),
-                        (snakeXs[i] * blockSize) + blockSize,
-                        (snakeYs[i] * blockSize) + blockSize,
-                        paint);
-            }
+//            // Draw the snake one block at a time
+//            for (int i = 1; i < snakeLength; i++) {
+//                canvas.drawRect(snakeXs[i] * blockSize,
+//                        (snakeYs[i] * blockSize),
+//                        (snakeXs[i] * blockSize) + blockSize,
+//                        (snakeYs[i] * blockSize) + blockSize,
+//                        paint);
+//            }
 
             //Draw the head
-            canvas.drawBitmap(headImg, snakeXs[0]*blockSize, snakeYs[0]*blockSize, paint);
+            canvas.drawBitmap(headImg, dragonCol*blockWidth, dragonRow*blockHeight, paint);
+//            canvas.drawBitmap(headImg, snakeXs[0]*blockSize, snakeYs[0]*blockSize, paint);
+
+            // Draw the full maze every time
+            // TODO: Optimize to only draw the moving parts
+            Bitmap b = null;
+            for (int r = 0; r < maze.getHeight(); r++) {
+                for (int c = 0; c < maze.getWidth(); c++) {
+                    b = maze.getBitMap(r, c);
+                    if (b != null) {
+                        canvas.drawBitmap(b, c*blockWidth, r*blockHeight, paint);
+                    }
+                }
+            }
 
             // Set the color of the paint to draw Bob red
             paint.setColor(Color.argb(255, 255, 0, 0));
 
             // Draw Bob
-            canvas.drawRect(bobX * blockSize,
-                    (bobY * blockSize),
-                    (bobX * blockSize) + blockSize,
-                    (bobY * blockSize) + blockSize,
+            canvas.drawRect(bobX * blockWidth,
+                    (bobY * blockHeight),
+                    (bobX * blockWidth) + blockWidth,
+                    (bobY * blockHeight) + blockHeight,
                     paint);
 
             // Unlock the canvas and reveal the graphics for this frame
@@ -425,6 +570,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
+        // Save the prior heading before updating (used for proper rendering)
+        // prevHeading = this.heading;
+
+        // uncomment for joystick style controls
 //        if (this.mDetector.onTouchEvent(motionEvent)) {
 //            return true;
 //        }
@@ -437,7 +586,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
                         case UP:
                             heading = Heading.RIGHT;
                             headImg = headRight;
-                            bodyImg = bodyU2R;
                             break;
                         case RIGHT:
                             heading = Heading.DOWN;
@@ -475,6 +623,34 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         }
         return true;
     }
+
+    /**
+     * getTailImg
+     * h = a Heading
+     * @return proper tail image
+     */
+
+    public Bitmap getTailImg(Heading h) {
+        switch (h) {
+            case LEFT:
+                return tailR;
+            case RIGHT:
+                return tailL;
+            case UP:
+                return tailU;
+            case DOWN:
+                return tailD;
+            default:
+                // should never get here, so put in a wonky image
+                return headDown;
+        }
+
+    }
+
+
+    /**
+     * The sub class enables joystick-style controls
+     */
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
