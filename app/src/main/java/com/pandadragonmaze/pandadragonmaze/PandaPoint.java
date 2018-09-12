@@ -15,6 +15,10 @@ public class PandaPoint extends MazePoint {
         this.engine = engine;
     }
 
+    public PandaPoint(int row, int col, SnakeEngine engine) {
+        this(row, col, engine.panda, engine);
+    }
+
     public void isOn() {
         this.engine.pickUp(this);
     }
